@@ -11,18 +11,81 @@
   <body>
     <h3>Project 1</h3>
 
-    <script>
-      // Loading the dataset
-      var dataset;
+    <svg id="svg" height="500" width="500"> </svg>
 
-      d3.csv('NCAA_shots.csv').then( (data) => {
-        dataset = data;
-        console.log(data);
+    <p id ="visualization1">
+      <h3><b> Visualization #1 </b></h3>
 
-      });
+      <script>
+        // Loading the dataset
+        var dataset;
+
+        d3.csv('ElectricCarData_Clean.csv').then( (data) => {
+          dataset = data;
+          console.log(data);
+
+          const svg = d3.select('svg');
+          const width = svg.attr('width');
+          const height = svg.attr('height');
+          const margins = {top: 10, right: 10, bottom: 100, left: 100};
+          const chartWidth = width - margins.left - margins.right;
+          const chartHeight = height - margins.top - margins.bottom;
+
+          const efficiencyExtent = d3.extent(data, d => parseInt(d['Efficiency_WhKm']) );
+          const xScale = d3.scaleLog().domain(efficiencyExtent).range([0, chartWidth]);
+
+          const priceExtent = d3.extent(data, d => parseInt(d['PriceEuro']) );
+          const yScale = d3.scaleLinear().domain(priceExtent).range([chartHeight, 0]);
+
+          svg.selectAll("circle").data(data)
+             .join("circle")
+             .attr("cx", d => xScale(d['Efficiency_WhKm']) )
+             .attr("cy", d => yScale(d['PriceEuro']) )
+             .attr("r", 5)
+             .attr("fill", "lightblue");
+
+         let xAxis = d3.axisBottom(xScale);
+         svg.append('g')
+             .attr('class', 'y axis')
+             .attr('transform',`translate(${margins.left},${chartHeight+margins.top+10})`)
+             .call(xAxis);
+
+           let yAxis = d3.axisLeft(yScale);
+           svg.append('g')
+             .attr('class', 'y axis')
+             .attr('transform',`translate(${margins.left-10},${margins.top})`)
+             .call(yAxis);
+
+            // x axis label
+            svg.append("text")
+              .attr("class", "x label")
+              .attr("text-anchor", "center")
+              .attr("x", width/2)
+              .attr("y", height - 10)
+              .text("Efficiency (WhKm)");
+
+            // y axis label
+            svg.append("text")
+              .attr("class", "y label")
+              .attr("text-anchor", "end")
+              .attr("x", -chartWidth/2)
+              .attr("y", 30)
+              .attr("transform", "rotate(-90)")
+             .text("Price (in euros)");
 
 
-    </script>
+        }); // end of promise
+
+
+      </script>
+    </p>
+
+    <p id ="visualization2">
+      <h3><b> Visualization #2 </b></h3>
+
+      <script>
+      </script>
+    </p>
 
   </body>
 
