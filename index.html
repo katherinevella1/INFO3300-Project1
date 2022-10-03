@@ -92,7 +92,7 @@
 
         d3.csv('ElectricCarData_Clean.csv').then( (data) => {
           dataset = data;
-          console.log(data);
+          //console.log(data);
 
           const svg_lux = d3.select('svg#lux');
           const width = svg_lux.attr('width');
@@ -103,25 +103,36 @@
 
           let lux_cars = data.filter(function(d) {return d.Segment == "F";})
 
+          // creating new column "Brand_Model"
+          lux_cars.forEach( (d, i) => {
+            d["Brand_Model"] = d["Brand"]+d["Model"];
+          });
+
+          console.log(lux_cars);
+
           const accelerationExtent = d3.extent(data, d => parseInt(d['AccelSec']) );
           const acceleration_Scale = d3.scaleLinear().domain(accelerationExtent).range([0, 5]);
 
-          const models = d3.map(lux_cars, d => d.Model)
-          const carScale = d3.scaleBand().domain(models).range([0, chartWidth]);
+          const brand_models = d3.map(lux_cars, d => d.Brand_Model)
+          const carScale = d3.scaleBand().domain(brand_models).range([0, chartWidth]);
 
-          let bottomAxis = d3.axisBottom();
-          let bottomAxisG = svg_lux.append("g")
-                             .attr("class", "x axis")
-                             .attr("transform",`translate(${margins.left},${chartHeight+margins.top+10})`)
-                             
 
-          bottomAxis.scale(carScale);
-          bottomAxisG.call(bottomAxis);
+          let bottomAxis = d3.axisBottom().scale(carScale);
+          svg_lux.append("g")
+               .attr("class", "x axis")
+               .attr("transform",`translate(${margins.left},${chartHeight+margins.top})`)
+               .call(bottomAxis)
+            .selectAll("text")
+              .attr("transform", "rotate(-90)")
+              .style("text-anchor", "end");
+
+          let chartArea = svg_lux.append("g").attr("id", "points")
+                .attr("transform",`translate(${margins.left},${chartHeight+margins.top})`);
 
           chartArea.selectAll('rect.bar').data( lux_cars )
             .join('rect').attr('class','bar')
             .attr("fill", "steelblue")
-            .attr("x", d => carScale(d.Model))
+            .attr("x", d => carScale(d.Brand_Model))
             .attr("y", d => 20)
             .attr("height", 20)
             .attr("width", 5);
