@@ -101,13 +101,25 @@
           const chartWidth = width - margins.left - margins.right;
           const chartHeight = height - margins.top - margins.bottom;
 
-          let lux_cars = [];
-          data.forEach( (d, i) => {
-            if(d['Segment'] == "F"){
-              console.log(d);
-            }
+          let lux_cars = data.filter(function(d) {return d.Segment == "F";})
 
-          });
+          const accelerationExtent = d3.extent(data, d => parseInt(d['AccelSec']) );
+          const acceleration_Scale = d3.scaleLinear().domain(accelerationExtent).range([0, 5]);
+
+          const models = d3.map(lux_cars, d => d.Model)
+          const carScale = d3.scaleBand().domain(models).range([0, chartWidth]);
+
+          bottomAxis.scale(carScale);
+          bottomAxisG.call(bottomAxis);
+
+          chartArea.selectAll('rect.bar').data( lux_cars )
+            .join('rect').attr('class','bar')
+            .attr("fill", "steelblue")
+            .attr("x", d => carScale(d.Model))
+            .attr("y", d => 20)
+            .attr("height", 20)
+            .attr("width", 5);
+
 
         }); // end of promise
 
