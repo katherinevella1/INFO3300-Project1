@@ -83,7 +83,36 @@
     <p id ="visualization2">
       <h3><b> Visualization #2 </b></h3>
 
+      <svg id="lux" height="500" width="800"> </svg>
+
       <script>
+
+        // Loading the dataset
+        var dataset;
+
+        d3.csv('ElectricCarData_Clean.csv').then( (data) => {
+          dataset = data;
+          console.log(data);
+
+          const svg_lux = d3.select('svg#lux');
+          const width = svg_lux.attr('width');
+          const height = svg_lux.attr('height');
+          const margins = {top: 10, right: 10, bottom: 100, left: 100};
+          const chartWidth = width - margins.left - margins.right;
+          const chartHeight = height - margins.top - margins.bottom;
+
+          let lux_cars = [];
+          data.forEach( (d, i) => {
+            if(d['Segment'] == "F"){
+              console.log(d);
+            }
+
+          });
+
+        }); // end of promise
+
+
+
       </script>
     </p>
 
