@@ -115,17 +115,20 @@
           // Filter Dataset for Luxury Vehicles
           let lux_cars = data.filter(function(d) {return d.Segment == "F";})
 
+          let top_six = lux_cars.filter(d => d.Model == "Air" || d.Model == "e-tron GT" || d.Model == "One" || d.Model == "Taycan Cross Turismo" || "Model X Performance");
+
           // Create New Column "Brand_Model" - Combine the Brand and Model names for labeling clarity on vis
           lux_cars.forEach( (d, i) => {
             d["Brand_Model"] = d["Brand"]+d["Model"];
           });
 
-          console.log(lux_cars);
+          console.log(top_six);
 
           // Extents and Scales Setup
           // Y-axis is going to consist of AccelSec, TopSpeed_KmH, PriceEuro, Range_Km
           const accelerationExtent = d3.extent(data, d => parseInt(d['AccelSec']));
-          const acceleration_Scale = d3.scaleLinear().domain(accelerationExtent).range([1, 50]);
+          const acceleration_Scale = d3.scaleLinear().domain(accelerationExtent).range([10, 50]);
+          const acceleration_Opacity = d3.scaleLinear().domain(accelerationExtent).range([0, 1]);
 
           const topSpeedExtent = d3.extent(data, d => parseInt(d['TopSpeed_KmH']));
           const topSpeed_Scale = d3.scaleLinear().domain(topSpeedExtent).range([1, 50]);
@@ -194,7 +197,8 @@
                             //y_Scale(["AccelSec", "TopSpeed_KmH", "PriceEuro", "Range_Km"]) + y_Scale.bandwidth()/2)
                             y_Scale("AccelSec") + y_Scale.bandwidth()/2)
                  .attr("r", d => acceleration_Scale(d.AccelSec))
-                 .style("fill",  "purple");
+                 .style("fill",  "purple")
+                 .style("opacity", d => acceleration_Opacity(d.AccelSec));
         }); // End of promise
 
 
