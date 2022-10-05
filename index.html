@@ -112,9 +112,12 @@
           const chartWidth = width - margins.left - margins.right;
           const chartHeight = height - margins.top - margins.bottom;
 
+
+
           // Filter Dataset for Luxury Vehicles
           let lux_cars = data.filter(function(d) {return d.Segment == "F";})
 
+          // NEED TO FIX!!!!
           let top_six = lux_cars.filter(d => d.Model == "Air" || d.Model == "e-tron GT" || d.Model == "One" || d.Model == "Taycan Cross Turismo" || "Model X Performance");
 
           // Create New Column "Brand_Model" - Combine the Brand and Model names for labeling clarity on vis
@@ -128,19 +131,23 @@
           // Y-axis is going to consist of AccelSec, TopSpeed_KmH, PriceEuro, Range_Km
           const accelerationExtent = d3.extent(data, d => parseInt(d['AccelSec']));
           const acceleration_Scale = d3.scaleLinear().domain(accelerationExtent).range([10, 50]);
-          const acceleration_Opacity = d3.scaleLinear().domain(accelerationExtent).range([0, 1]);
+          const acceleration_colorScale= d3.scaleSequential().interpolator(d3.interpolateYlGnBu).domain(accelerationExtent);
 
           const topSpeedExtent = d3.extent(data, d => parseInt(d['TopSpeed_KmH']));
           const topSpeed_Scale = d3.scaleLinear().domain(topSpeedExtent).range([1, 50]);
+          const topSpeed_Opacity = d3.scaleLinear().domain(topSpeedExtent).range([0, 1]);
+          const topSpeed_colorScale= d3.scaleSequential().interpolator(d3.interpolateYlGnBu).domain(topSpeedExtent);
 
           const priceExtent = d3.extent(data, d => parseInt(d['PriceEuro']));
           const price_Scale = d3.scaleLinear().domain(priceExtent).range([1, 50]);
+          const price_colorScale= d3.scaleSequential().interpolator(d3.interpolateYlGnBu).domain(priceExtent);
 
           const rangeExtent = d3.extent(data, d => parseInt(d['Range_Km']));
           const range_Scale = d3.scaleLinear().domain(rangeExtent).range([1, 50]);
+          const range_colorScale= d3.scaleSequential().interpolator(d3.interpolateYlGnBu).domain(rangeExtent);
+
 
           // Y Scale
-          //const y_Scale = d3.scaleLinear().domain([1, 4]).range([chartHeight, 0]);
           const y_Scale = d3.scaleBand().domain(["AccelSec", "TopSpeed_KmH", "PriceEuro", "Range_Km"])
                                          .range([chartHeight, 0]);
 
@@ -149,6 +156,15 @@
 
 
           // PARENT CHART G TAGS INITIALIZATION
+          let back= svg_lux.append("g").attr("id", "background")
+                           .append("rect")
+                           .attr("x", 0)
+                           .attr("y", 0)
+                           .attr("fill", "#152238")
+                           .attr("rx", 30)
+                           .attr("ry", 30)
+                           .attr("width", width)
+                           .attr("height", height);
           let annotations = svg_lux.append("g").attr("id", "annotations"); // All labels and gridlines
           let chartArea = svg_lux.append("g")
                                  .attr("id", "points")
@@ -162,6 +178,7 @@
                      .call(bottomAxis)
                      .selectAll("text")
                      .attr("transform", "rotate(-90)")
+                     .attr("color", "white")
                      .style("text-anchor", "end");
           let bottomGridlines = d3.axisBottom(carScale)
                                   .tickSize(-chartHeight-10)
@@ -193,12 +210,16 @@
           circles.append("g").selectAll("g.circle").data(lux_cars)
                  .join("circle")
                  .attr("cx", d => carScale(d.Brand_Model) + (carScale.bandwidth()/2))
-                 .attr("cy",
-                            //y_Scale(["AccelSec", "TopSpeed_KmH", "PriceEuro", "Range_Km"]) + y_Scale.bandwidth()/2)
-                            y_Scale("AccelSec") + y_Scale.bandwidth()/2)
+                 .attr("cy", y_Scale("AccelSec") + y_Scale.bandwidth()/2)
                  .attr("r", d => acceleration_Scale(d.AccelSec))
-                 .style("fill",  "purple")
-                 .style("opacity", d => acceleration_Opacity(d.AccelSec));
+                 .style("fill",  d => acceleration_colorScale(d.AccelSec));
+
+          circles.append("g").selectAll("g.circle").data(lux_cars)
+                 .join("circle")
+                 .attr("cx", d => carScale(d.Brand_Model) + (carScale.bandwidth()/2))
+                 .attr("cy", y_Scale("TopSpeed_KmH") + y_Scale.bandwidth()/2)
+                 .attr("r", d => topSpeed_Scale(d.TopSpeed_KmH))
+                 .style("fill",  d => topSpeed_colorScale(d.TopSpeed_KmH));
         }); // End of promise
 
 
