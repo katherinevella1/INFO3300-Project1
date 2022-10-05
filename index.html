@@ -94,7 +94,7 @@
     <p id ="visualization2">
       <h3><b> Visualization #2: Luxury Vehicle Performance Circle Chart </b></h3>
 
-      <svg id="lux" height="500" width="1000"> </svg>
+      <svg id="lux" height="500" width="1100"> </svg>
 
       <script>
         // Loading the dataset
@@ -113,38 +113,41 @@
           const chartHeight = height - margins.top - margins.bottom;
 
 
-
           // Filter Dataset for Luxury Vehicles
           let lux_cars = data.filter(function(d) {return d.Segment == "F";})
 
           // NEED TO FIX!!!!
-          let top_six = lux_cars.filter(d => d.Model == "Air" || d.Model == "e-tron GT" || d.Model == "One" || d.Model == "Taycan Cross Turismo" || "Model X Performance");
+          //let top_six = lux_cars.filter(d => d.Model == "Air" || d.Model == "e-tron GT" || d.Model == "One" || d.Model == "Taycan Cross Turismo" || "Model X Performance");
 
           // Create New Column "Brand_Model" - Combine the Brand and Model names for labeling clarity on vis
           lux_cars.forEach( (d, i) => {
             d["Brand_Model"] = d["Brand"]+d["Model"];
           });
 
-          console.log(top_six);
 
           // Extents and Scales Setup
           // Y-axis is going to consist of AccelSec, TopSpeed_KmH, PriceEuro, Range_Km
-          const accelerationExtent = d3.extent(data, d => parseInt(d['AccelSec']));
-          const acceleration_Scale = d3.scaleLinear().domain(accelerationExtent).range([10, 50]);
-          const acceleration_colorScale= d3.scaleSequential().interpolator(d3.interpolateYlGnBu).domain(accelerationExtent);
+          const accelerationExtent = d3.extent(lux_cars, d => parseInt(d['AccelSec']));
+          const acceleration_Scale = d3.scaleLinear().domain(accelerationExtent).range([10, 40]);
+          const acceleration_colorScale= d3.scaleSequential().interpolator(d3.interpolateCool).domain(accelerationExtent);
 
-          const topSpeedExtent = d3.extent(data, d => parseInt(d['TopSpeed_KmH']));
-          const topSpeed_Scale = d3.scaleLinear().domain(topSpeedExtent).range([1, 50]);
-          const topSpeed_Opacity = d3.scaleLinear().domain(topSpeedExtent).range([0, 1]);
-          const topSpeed_colorScale= d3.scaleSequential().interpolator(d3.interpolateYlGnBu).domain(topSpeedExtent);
+          const topSpeedExtent = d3.extent(lux_cars, d => parseInt(d['TopSpeed_KmH']));
+          const topSpeed_Scale = d3.scaleLinear().domain(topSpeedExtent).range([10, 40]);
+          const topSpeed_colorScale= d3.scaleSequential().interpolator(d3.interpolateCool).domain(topSpeedExtent);
 
-          const priceExtent = d3.extent(data, d => parseInt(d['PriceEuro']));
-          const price_Scale = d3.scaleLinear().domain(priceExtent).range([1, 50]);
-          const price_colorScale= d3.scaleSequential().interpolator(d3.interpolateYlGnBu).domain(priceExtent);
+          const priceExtent = d3.extent(lux_cars, d => parseInt(d['PriceEuro']));
+          const price_Scale = d3.scaleLinear().domain(priceExtent).range([10, 40]);
+          const price_colorScale= d3.scaleSequential().interpolator(d3.interpolateCool).domain(priceExtent);
 
-          const rangeExtent = d3.extent(data, d => parseInt(d['Range_Km']));
-          const range_Scale = d3.scaleLinear().domain(rangeExtent).range([1, 50]);
-          const range_colorScale= d3.scaleSequential().interpolator(d3.interpolateYlGnBu).domain(rangeExtent);
+          const rangeExtent = d3.extent(lux_cars, d => parseInt(d['Range_Km']));
+          const range_Scale = d3.scaleLinear().domain(rangeExtent).range([10, 40]);
+          const range_colorScale= d3.scaleSequential().interpolator(d3.interpolateCool).domain(rangeExtent);
+
+          // Sort Data Before Plotting
+          lux_cars.sort((a, b) => acceleration_Scale(b['AccelSec']) - acceleration_Scale(a['AccelSec']));
+                                  //topSpeed_Scale(b['TopSpeed_KmH']) - topSpeed_Scale(a['TopSpeed_KmH']));
+
+          console.log(lux_cars);
 
 
           // Y Scale
@@ -152,7 +155,8 @@
                                          .range([chartHeight, 0]);
 
           const brand_models = d3.map(lux_cars, d => d.Brand_Model);
-          const carScale = d3.scaleBand().domain(brand_models).range([0, chartWidth-10]);
+          const carScale = d3.scaleBand().domain(brand_models).range([0, chartWidth-10]).paddingInner(.1)
+                             .paddingOuter(.3);
 
 
           // PARENT CHART G TAGS INITIALIZATION
@@ -175,14 +179,17 @@
           annotations.append("g")
                      .attr("class", "x axis")
                      .attr("transform",`translate(${margins.left}, ${chartHeight+margins.top+30})`)
-                     .call(bottomAxis)
-                     .selectAll("text")
-                     .attr("transform", "rotate(-90)")
                      .attr("color", "white")
-                     .style("text-anchor", "end");
+                     .call(bottomAxis)
+                     .selectAll(".tick text")
+                     .call(wrap, carScale.bandwidth());
+          annotations.selectAll("text")
+                     .attr("color", "white");
           let bottomGridlines = d3.axisBottom(carScale)
-                                  .tickSize(-chartHeight-10)
+                                  .tickSize(-chartWidth-10)
                                   .tickFormat("")
+          //console.log(wrap(lux_cars.Brand_Model, 20));
+
           annotations.append("g")
                      .attr("class", "x gridlines")
                      .attr("transform",`translate(${margins.left}, ${chartHeight+margins.top+10})`)
@@ -196,6 +203,7 @@
           annotations.append("g")
                      .attr("class", "y axis")
                      .attr("transform",`translate(${margins.left-10},${margins.top})`)
+                     .attr("color", "white")
                      .call(leftAxis);
           // annotations.append("g")
           //            .attr("class", "y gridlines")
@@ -205,8 +213,8 @@
           let circles= chartArea.selectAll('g.circle').data(lux_cars)
                                 .join("g")
                                 .attr("class", "circle");
-                                //.style("stroke", d => acceleration_Scale(d.AccelSec));
 
+          // Acceleration
           circles.append("g").selectAll("g.circle").data(lux_cars)
                  .join("circle")
                  .attr("cx", d => carScale(d.Brand_Model) + (carScale.bandwidth()/2))
@@ -214,15 +222,54 @@
                  .attr("r", d => acceleration_Scale(d.AccelSec))
                  .style("fill",  d => acceleration_colorScale(d.AccelSec));
 
+        // Top Speed
           circles.append("g").selectAll("g.circle").data(lux_cars)
                  .join("circle")
                  .attr("cx", d => carScale(d.Brand_Model) + (carScale.bandwidth()/2))
                  .attr("cy", y_Scale("TopSpeed_KmH") + y_Scale.bandwidth()/2)
                  .attr("r", d => topSpeed_Scale(d.TopSpeed_KmH))
                  .style("fill",  d => topSpeed_colorScale(d.TopSpeed_KmH));
+
+          // Price
+          circles.append("g").selectAll("g.circle").data(lux_cars)
+                  .join("circle")
+                  .attr("cx", d => carScale(d.Brand_Model) + (carScale.bandwidth()/2))
+                  .attr("cy", y_Scale("PriceEuro") + y_Scale.bandwidth()/2)
+                  .attr("r", d => price_Scale(d.PriceEuro))
+                  .style("fill",  d => price_colorScale(d.PriceEuro));
+
+        // Range
+        circles.append("g").selectAll("g.circle").data(lux_cars)
+                  .join("circle")
+                  .attr("cx", d => carScale(d.Brand_Model) + (carScale.bandwidth()/2))
+                  .attr("cy", y_Scale("Range_Km") + y_Scale.bandwidth()/2)
+                  .attr("r", d => range_Scale(d.Range_Km))
+                  .style("fill",  d => range_colorScale(d.Range_Km));
         }); // End of promise
 
-
+        // Function to wrap labels provided by Blocks.org (https://bl.ocks.org/guypursey/f47d8cd11a8ff24854305505dbbd8c07)
+        function wrap(text, width) {
+          text.each(function() {
+            var text = d3.select(this),
+                words = text.text().split(/\s+/).reverse(),
+                word,
+                line = [],
+                lineNumber = 0,
+                lineHeight = 1.1, // ems
+                y = text.attr("y"),
+                dy = parseFloat(text.attr("dy")),
+                tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em")
+            while (word = words.pop()) {
+              line.push(word)
+              tspan.text(line.join(" "))
+              if (tspan.node().getComputedTextLength() > width) {
+                line.pop()
+                tspan.text(line.join(" "))
+                line = [word]
+                tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", `${++lineNumber * lineHeight + dy}em`).text(word)
+              }
+            }
+          })};
 
       </script>
     </p>
