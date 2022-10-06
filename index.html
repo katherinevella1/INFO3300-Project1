@@ -38,24 +38,6 @@
             color: white;
           }
 
-          #annotations{
-            color: white;
-          }
-
-          text.title{
-            fill: white;
-          }
-
-          text.y.label{
-            fill: white;
-            font-size: 20px;
-          }
-
-          text.x.label{
-            fill: white;
-            font-size: 20px;
-          }
-
     </style>
 
   </head>
@@ -224,32 +206,17 @@
                                  .attr("id", "points")
                                  .attr("transform",`translate(${margins.left}, ${margins.top})`); // All vis content
 
-
-
-         // Title
-         annotations.append("text")
-           .attr("class", "title")
-           .attr("x", width/2)
-           .attr("y", 10)
-           .attr("text-anchor", "middle")
-           .text("Luxury Vehicle Performance Circle Chart")
-           .style("font-size", "30px")
-           .style("margin-bottom", "10")
-
-
           // Initialize g Tag for X-Axis and Add Labels
           let bottomAxis = d3.axisBottom().scale(carScale);
-
           annotations.append("g")
                      .attr("class", "x axis")
                      .attr("transform",`translate(${margins.left}, ${chartHeight+margins.top+30})`)
+                     .attr("color", "white")
                      .call(bottomAxis)
                      .selectAll(".tick text")
                      .call(wrap, carScale.bandwidth());
-          /*
           annotations.selectAll("text")
                      .attr("color", "white");
-          */
           let bottomGridlines = d3.axisBottom(carScale)
                                   .tickSize(-chartWidth-10)
                                   .tickFormat("")
@@ -268,6 +235,7 @@
           annotations.append("g")
                      .attr("class", "y axis")
                      .attr("transform",`translate(${margins.left-10},${margins.top})`)
+                     .attr("color", "white")
                      .call(leftAxis);
           // annotations.append("g")
           //            .attr("class", "y gridlines")
@@ -342,7 +310,7 @@
     <p id ="visualization2">
       <h3><b> Visualization 2: Range (km) Barchart </b></h3>
 
-      <svg id="range_barchart" height="500" width="1100"> </svg>
+      <svg id="range_barchart" height="500" width="1000"> </svg>
 
       <script>
         // Loading the dataset
@@ -355,7 +323,7 @@
           const svgBar = d3.select('svg#range_barchart');
           const width = svgBar.attr('width');
           const height = svgBar.attr('height');
-          const margins = {top: 60, right: 80, bottom: 60, left: 200};
+          const margins = {top: 10, right: 80, bottom: 100, left: 200};
           const chartWidth = width - margins.left - margins.right;
           const chartHeight = height - margins.top - margins.bottom;
 
@@ -382,16 +350,6 @@
 
           const colorScale = d3.scaleOrdinal(d3.schemeCategory10);
 
-          // Title
-          annotations.append("text")
-            .attr("class", "title")
-            .attr("text-anchor", "middle")
-            .attr("x", width/2)
-            .attr("y", 30)
-            .text("Bar Chart of Range (Km) by Model of Car")
-            //.style("fill", "white")
-            .style("font-size", "30px")
-
           // x axis (Range) and y axis (BrandModel)
           let leftAxis = d3.axisLeft(carScale); // Will need to change to include all in future!
           let leftGridlines = d3.axisLeft(carScale)
@@ -410,15 +368,15 @@
 
           // Axis Labels
           // X-axis label
-          annotations.append("text")
-            .attr("class", "x label")
+          svgBar.append("text")
+            .attr("class", "xlabel")
             .attr("text-anchor", "center")
             .attr("x", width/2)
-            .attr("y", height-5)
+            .attr("y", height - 40)
             .text("Range (Km)");
 
           // Y-axis label
-          annotations.append("text")
+          svgBar.append("text")
             .attr("class", "y label")
             .attr("text-anchor", "end")
             .attr("x", -chartHeight/2 + 20)
