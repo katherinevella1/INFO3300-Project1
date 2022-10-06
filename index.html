@@ -222,7 +222,129 @@
                  .style("fill",  d => topSpeed_colorScale(d.TopSpeed_KmH));
         }); // End of promise
 
+      </script>
+    </p>
 
+
+
+    <!-- BARCHART -->
+    <p id ="visualization3">
+      <h3><b> Visualization #3: Range (km) Barchart </b></h3>
+
+      <svg id="range_barchart" height="500" width="1000"> </svg>
+
+      <script>
+        // Loading the dataset
+        var dataset;
+
+        d3.csv('ElectricCarData_Clean.csv').then( (data) => {
+          dataset = data;
+
+          // Bar Chart Setup
+          const svgBar = d3.select('svg#range_barchart');
+          const width = svgBar.attr('width');
+          const height = svgBar.attr('height');
+          const margins = {top: 10, right: 80, bottom: 100, left: 200};
+          const chartWidth = width - margins.left - margins.right;
+          const chartHeight = height - margins.top - margins.bottom;
+
+          let annotations = svgBar.append("g").attr("id", "annotations"); // All labels and gridlines
+          let chartArea = svgBar.append("g")
+                                 .attr("id", "points")
+                                 .attr("transform",`translate(${margins.left}, ${margins.top})`); // All vis content
+
+          // Filter Dataset for Luxury Vehicles
+          let lux_cars = data.filter(function(d) {return d.Segment == "F";})
+
+          // Create New Column "Brand_Model" - Combine the Brand and Model names for labeling clarity on vis
+          lux_cars.forEach( (d, i) => {
+            d["Brand_Model"] = d["Brand"]+d["Model"];
+          });
+
+          // Extents and Scales Setup
+          const rangeExtent = d3.extent(lux_cars, l => parseInt(l['Range_Km']));
+          const rangeScale = d3.scaleLinear().domain([0,rangeExtent[1]]).range([0, chartWidth]);
+
+
+          const brand_models = d3.map(lux_cars, d => d.Brand_Model);
+          const carScale = d3.scaleBand().domain(brand_models).range([0, chartHeight-10]);
+
+          const colorScale = d3.scaleOrdinal(d3.schemeCategory10);
+
+          // x axis (Range) and y axis (BrandModel)
+          let leftAxis = d3.axisLeft(carScale); // Will need to change to include all in future!
+          let leftGridlines = d3.axisLeft(carScale)
+                                .tickSize(-chartWidth-10)
+                                .tickFormat("");
+          annotations.append("g")
+                     .attr("class", "y axis")
+                     .attr("transform",`translate(${margins.left-10},${margins.top})`)
+                     .call(leftAxis);
+
+          let bottomAxis = d3.axisBottom().scale(rangeScale);
+          annotations.append("g")
+                     .attr("class", "x axis")
+                     .attr("transform",`translate(${margins.left}, ${chartHeight+margins.top+10})`)
+                     .call(bottomAxis)
+
+          // Axis Labels
+          // X-axis label
+          svgBar.append("text")
+            .attr("class", "x label")
+            .attr("text-anchor", "center")
+            .attr("x", width/2)
+            .attr("y", height - 40)
+            .text("Range (Km)");
+
+          // Y-axis label
+          svgBar.append("text")
+            .attr("class", "y label")
+            .attr("text-anchor", "end")
+            .attr("x", -chartHeight/2 + 20)
+            .attr("y", 30)
+            .attr("transform", "rotate(-90)")
+           .text("Model of Car");
+
+          // create the bars
+          chartArea.selectAll('rect.bar').data( lux_cars, l => l['Range_Km']  )
+                .join( enter => enter.append('rect')
+                .attr('class','bar')
+                .attr("fill", "steelblue")
+                .attr("x", 0)
+                .attr("y", l => carScale(l.Brand_Model))
+                .attr("width", l => rangeScale(l.Range_Km))
+                .attr("height", carScale.bandwidth()-10)
+                .attr("fill", l => colorScale(l.Brand_Model))
+
+          );
+
+        chartArea.selectAll('image').data( lux_cars, l => l['Brand_Model']  )
+              .join( enter => enter.append('image')
+              .attr('class','image')
+              .attr('xlink:href', l => 'images/' + l.Brand_Model + '.png')
+              .attr('height', carScale.bandwidth()-5)
+              .attr("x", l => rangeScale(l.Range_Km)-50)
+              .attr("y", l => carScale(l.Brand_Model)-2)
+
+        );
+
+        /* Image Sources
+        Lucid Air: https://www.lucidmotors.com/media-room/introducing-sapphire-pinnacle-of-electric-performance
+        Porsche Taycan Turbo S: https://www.porsche.com/usa/models/taycan/taycan-models/taycan-turbo-s/
+        Audi e-tron GT: https://www.omaze.com/products/audi-rs-etron-gt
+        Tesla Model S Long Range: https://www.tesla.com/models
+        Porsche Taycan 4S: https://www.porsche.com/singapore/en/models/taycan/taycan-models/taycan-4s/
+        Lightyear One: https://lightyear.one/
+        Tesla Model X Long Range: https://www.evspecifications.com/en/model/17c110b
+        Tesla Model S Performance: https://www.tesla.com/models
+        Porsche Taycan 4S Plus: https://www.porsche.com/usa/models/taycan/taycan-models/taycan-4s/
+        Porsche Taycan Cross Turismo: https://www.porsche.com/usa/models/taycan/taycan-models/taycan-4s-cross-turismo/
+        Porsche Taycan Turbo: https://press.porsche.com/prod/presse_pag/PressResources.nsf/jumppage/modelle-taycan-taycan_turbo?OpenDocument
+        Tesla Model X Performance:
+
+        */
+
+        }); // end promise
 
       </script>
     </p>
