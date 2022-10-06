@@ -340,6 +340,8 @@
             d["Brand_Model"] = d["Brand"]+d["Model"];
           });
 
+          lux_cars.sort((a, b) => parseInt(b['Range_Km']) - parseInt(a['Range_Km']));
+
           // Extents and Scales Setup
           const rangeExtent = d3.extent(lux_cars, l => parseInt(l['Range_Km']));
           const rangeScale = d3.scaleLinear().domain([0,rangeExtent[1]]).range([0, chartWidth]);
