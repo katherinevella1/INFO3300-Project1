@@ -13,19 +13,36 @@
       .gridlines .domain {
         stroke: none;
       }
+
+      #range_barchart{
+        background: #152238;
+        border-radius: 25px;
+        padding: 30px;
+        color: white;
+      }
+
+      #lux{
+        background: #152238;
+        border-radius: 25px;
+        padding: 30px;
+        color: white;
+      }
+
     </style>
 
   </head>
 
   <body>
-    <h3>Project 1</h3>
+    <h1>Project 1</h1>
+    <h2></h2>
 
+    <!-- INITIAL VISUALIZATION -- DELETE LATER
     <svg id="svg" height="500" width="500"> </svg>
-
     <p id ="visualization1">
       <h3><b> Visualization #1: Scatterplot </b></h3>
 
       <script>
+      /*
         // Loading the dataset
         var dataset;
 
@@ -87,9 +104,10 @@
              .text("Price (in euros)");
 
         }); // End of promise
+        */
       </script>
     </p>
-
+    -->
 
     <p id ="visualization2">
       <h3><b> Visualization #2: Luxury Vehicle Performance Circle Chart </b></h3>
@@ -156,6 +174,7 @@
 
 
           // PARENT CHART G TAGS INITIALIZATION
+          /*
           let back= svg_lux.append("g").attr("id", "background")
                            .append("rect")
                            .attr("x", 0)
@@ -165,6 +184,7 @@
                            .attr("ry", 30)
                            .attr("width", width)
                            .attr("height", height);
+          */
           let annotations = svg_lux.append("g").attr("id", "annotations"); // All labels and gridlines
           let chartArea = svg_lux.append("g")
                                  .attr("id", "points")
@@ -290,7 +310,7 @@
           // Axis Labels
           // X-axis label
           svgBar.append("text")
-            .attr("class", "x label")
+            .attr("class", "xlabel")
             .attr("text-anchor", "center")
             .attr("x", width/2)
             .attr("y", height - 40)
