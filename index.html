@@ -433,11 +433,14 @@
 
           );
 
+        // Car images
         chartArea.selectAll('image').data( lux_cars, l => l['Brand_Model']  )
               .join( enter => enter.append('image')
               .attr('class','image')
+              .attr('id', l => l['Brand_Model'])
               .attr('xlink:href', l => 'images/' + l.Brand_Model + '.png')
               .attr('height', carScale.bandwidth()-5)
+              .attr('width', 85)
               .attr("x", l => rangeScale(l.Range_Km)-50)
               .attr("y", l => carScale(l.Brand_Model)-2)
 
