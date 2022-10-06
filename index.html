@@ -124,6 +124,8 @@
             d["Brand_Model"] = d["Brand"]+d["Model"];
           });
 
+          lux_cars.sort((a, b) => parseInt(b['Range_Km']) - parseInt(a['Range_Km']));
+
 
           // Extents and Scales Setup
           // Y-axis is going to consist of AccelSec, TopSpeed_KmH, PriceEuro, Range_Km
