@@ -74,79 +74,6 @@
     <h1>Project 1</h1>
     <h4> By Fatima Yuen (fy46), Katherine Vella (skv25), and Lea Jih-Vieira (laj74) </h4>
 
-    <!-- INITIAL VISUALIZATION -- DELETE LATER
-    <svg id="svg" height="500" width="500"> </svg>
-    <p id ="visualization1">
-      <h3><b> Visualization #1: Scatterplot </b></h3>
-
-      <script>
-      /*
-        // Loading the dataset
-        var dataset;
-
-        d3.csv('ElectricCarData_Clean.csv').then( (data) => {
-          dataset = data;
-
-          // Scatterplot Setup
-          const svg = d3.select('svg');
-          const width = svg.attr('width');
-          const height = svg.attr('height');
-          const margins = {top: 10, right: 10, bottom: 100, left: 100};
-          const chartWidth = width - margins.left - margins.right;
-          const chartHeight = height - margins.top - margins.bottom;
-
-          // Extents and Respective Scales
-          const efficiencyExtent = d3.extent(data, d => parseInt(d['Efficiency_WhKm']) );
-          const xScale = d3.scaleLog().domain(efficiencyExtent).range([0, chartWidth]);
-
-          const priceExtent = d3.extent(data, d => parseInt(d['PriceEuro']) );
-          const yScale = d3.scaleLinear().domain(priceExtent).range([chartHeight, 0]);
-
-          // Plot points
-          svg.selectAll("circle").data(data)
-             .join("circle")
-             .attr("cx", d => xScale(d['Efficiency_WhKm']) )
-             .attr("cy", d => yScale(d['PriceEuro']) )
-             .attr("r", 5)
-             .attr("fill", "lightblue");
-
-         // Initialize Y-Axis g Tag
-         let xAxis = d3.axisBottom(xScale);
-         svg.append('g')
-             .attr('class', 'y axis')
-             .attr('transform',`translate(${margins.left},${chartHeight+margins.top+10})`)
-             .call(xAxis);
-
-           // Initialize Y-Axis g Tag
-           let yAxis = d3.axisLeft(yScale);
-           svg.append('g')
-             .attr('class', 'y axis')
-             .attr('transform',`translate(${margins.left-10},${margins.top})`)
-             .call(yAxis);
-
-            // X-axis label
-            svg.append("text")
-              .attr("class", "x label")
-              .attr("text-anchor", "center")
-              .attr("x", width/2)
-              .attr("y", height - 10)
-              .text("Efficiency (WhKm)");
-
-            // Y-axis label
-            svg.append("text")
-              .attr("class", "y label")
-              .attr("text-anchor", "end")
-              .attr("x", -chartWidth/2)
-              .attr("y", 30)
-              .attr("transform", "rotate(-90)")
-             .text("Price (in euros)");
-
-        }); // End of promise
-        */
-      </script>
-    </p>
-    -->
-
     <p id ="visualization1">
       <!--<h3><b> Visualization 1: Luxury Vehicle Performance Circle Chart </b></h3>-->
 
@@ -277,18 +204,28 @@
                      .call(bottomGridlines);
 
           // Intialize g Tag for Y-Axis and Add Labels
-          let leftAxis = d3.axisLeft(y_Scale); // Will need to change to include all in future!
+          // custom labels - Source: https://ghenshaw-work.medium.com/customizing-axes-in-d3-js-99d58863738b
+          let tickLabels = ['Acceleration 0-100 km/hr (secs)', // renamed from "AccelSec"
+                            'Highest Speed (km/hr)', // renamed from "TopSpeed_KmH"
+                            'Price (euro)', // renamed from "PriceEuro"
+                            'Energy Consumed (wh/km)']; // renamed from "Efficiency_WhKm"
+
+          let leftAxis = d3.axisLeft(y_Scale) // Will need to change to include all in future!
+                          .tickFormat((d,i) => tickLabels[i]);
+
           let leftGridlines = d3.axisLeft(y_Scale)
                                 .tickSize(-chartWidth-10)
                                 .tickFormat("");
+
           annotations.append("g")
-                     .attr("class", "y axis")
-                     .attr("transform",`translate(${margins.left-10},${margins.top})`)
-                     .call(leftAxis);
+                               .attr("class", "y axis")
+                               .attr("transform",`translate(${margins.left-10},${margins.top})`)
+                               .call(leftAxis);
           // annotations.append("g")
           //            .attr("class", "y gridlines")
           //            .attr("transform",`translate(${margins.left-10},${margins.top})`)
           //            .call(leftGridlines);
+
 
         // Acceleration
         chartArea.append("g").selectAll("circle").data(lux_cars)
@@ -314,31 +251,28 @@
                   .attr("r", d => price_Scale(d.PriceEuro))
                   .style("fill",  d => price_colorScale(d.PriceEuro));
 
-        // Efficiency
-        chartArea.append("g").selectAll("circle").data(lux_cars)
-                  .join("circle")
-                  .attr("cx", d => carScale(d.Brand_Model) + (carScale.bandwidth()/2))
-                  .attr("cy", y_Scale("Efficiency_WhKm") + y_Scale.bandwidth()/2)
-                  .attr("r", d => efficiency_Scale(d.Efficiency_WhKm))
-                  .style("fill",  d => efficiency_colorScale(d.Efficiency_WhKm));
+          // Efficiency
+          chartArea.append("g").selectAll("circle").data(lux_cars)
+                    .join("circle")
+                    .attr("cx", d => carScale(d.Brand_Model) + (carScale.bandwidth()/2))
+                    .attr("cy", y_Scale("Efficiency_WhKm") + y_Scale.bandwidth()/2)
+                    .attr("r", d => efficiency_Scale(d.Efficiency_WhKm))
+                    .style("fill",  d => efficiency_colorScale(d.Efficiency_WhKm));
 
-        // Legend
+          // Legend
 
-        const legend_colorScale= d3.scaleSequential().interpolator(d3.interpolateCool).domain(circle_radius);
+          const legend_colorScale= d3.scaleSequential().interpolator(d3.interpolateCool).domain(circle_radius);
 
-        let legend_array = [];
-        let counter=0;
-        for (let i = circle_radius[0]; i <= circle_radius[1]; i+=.03) {
-             chartArea.append("circle")
-               .attr('r', i )
-               .attr("cx", counter*1.2 - 20)
-               .attr("cy", chartHeight+158)
-               .attr("fill", legend_colorScale(i));
-             counter++;
-        }
-
-
-
+          let legend_array = [];
+          let counter=0;
+          for (let i = circle_radius[0]; i <= circle_radius[1]; i+=.03) {
+               chartArea.append("circle")
+                 .attr('r', i )
+                 .attr("cx", counter*1.2 - 20)
+                 .attr("cy", chartHeight+158)
+                 .attr("fill", legend_colorScale(i));
+               counter++;
+          }
 
         }); // End of promise
 
@@ -386,7 +320,7 @@
           const svgBar = d3.select('svg#range_barchart');
           const width = svgBar.attr('width');
           const height = svgBar.attr('height');
-          const margins = {top: 60, right: 80, bottom: 70, left: 240};
+          const margins = {top: 60, right: 100, bottom: 70, left: 240};
           const chartWidth = width - margins.left - margins.right;
           const chartHeight = height - margins.top - margins.bottom;
 
@@ -460,7 +394,9 @@
             .attr("transform", "rotate(-90)")
            .text("Model of Car");
 
-          // create the bars
+          // Create the bars
+          /*
+          // CAR TIP AS DATA WAY
           chartArea.selectAll('rect.bar').data( lux_cars, l => l['Range_Km']  )
                 .join( enter => enter.append('rect')
                 .attr('class','bar')
@@ -472,8 +408,27 @@
                 //.attr("fill", l => colorScale(l.Brand_Model))
                 .attr("fill", l => range_colorScale(l.Range_Km))
           );
+          */
+
+          // END OF BAR AS DATA WAY
+          chartArea.selectAll('rect.bar').data( lux_cars, l => l['Range_Km']  )
+                .join( enter => enter.append('rect')
+                .attr('class','bar')
+                .attr("fill", "steelblue")
+                .attr("x", 0)
+                .attr("y", l => carScale(l.Brand_Model))
+                .attr("width", l => rangeScale(l.Range_Km))
+                .attr("height", carScale.bandwidth()-10)
+                //.attr("fill", l => colorScale(l.Brand_Model))
+                .attr("fill", l => range_colorScale(l.Range_Km))
+          );
+
+
 
         // Car images
+
+        /*
+        // FRONT OF CAR AS DATA POINT
         chartArea.selectAll('image').data( lux_cars, l => l['Brand_Model']  )
               .join( enter => enter.append('image')
               .attr('class','image')
@@ -482,6 +437,20 @@
               .attr('height', carScale.bandwidth()-5)
               .attr('width', 84.83)
               .attr("x", l => rangeScale(l.Range_Km)-84.83)
+              .attr("y", l => carScale(l.Brand_Model)-2)
+
+        );
+        */
+
+        // END OF BAR AS DATA POINT (car after)
+        chartArea.selectAll('image').data( lux_cars, l => l['Brand_Model']  )
+              .join( enter => enter.append('image')
+              .attr('class','image')
+              .attr('id', l => l['PriceEuro']) //just using price euro as a unique identifier..
+              .attr('xlink:href', l => 'images/' + l.Brand_Model + '.png')
+              .attr('height', carScale.bandwidth()-5)
+              .attr('width', 84.83)
+              .attr("x", l => rangeScale(l.Range_Km)+10)
               .attr("y", l => carScale(l.Brand_Model)-2)
 
         );
