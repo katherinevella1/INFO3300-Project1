@@ -374,7 +374,8 @@
           const brand_models = d3.map(lux_cars, d => d.Brand_Model);
           const carScale = d3.scaleBand().domain(brand_models).range([0, chartHeight-10]);
 
-          const colorScale = d3.scaleOrdinal(d3.schemeCategory10);
+          //const colorScale = d3.scaleOrdinal(d3.schemeCategory10);
+          const range_colorScale= d3.scaleSequential().interpolator(d3.interpolateCool).domain(rangeExtent);
 
           // Title
           annotations.append("text")
@@ -429,8 +430,8 @@
                 .attr("y", l => carScale(l.Brand_Model))
                 .attr("width", l => rangeScale(l.Range_Km)-(84.83/2)) // minus half the width of car image
                 .attr("height", carScale.bandwidth()-10)
-                .attr("fill", l => colorScale(l.Brand_Model))
-
+                //.attr("fill", l => colorScale(l.Brand_Model))
+                .attr("fill", l => range_colorScale(l.Range_Km))
           );
 
         // Car images
