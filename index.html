@@ -189,8 +189,8 @@
           const efficiency_colorScale= d3.scaleSequential().interpolator(d3.interpolateCool).domain(efficiencyExtent);
 
           // Sort Data Before Plotting
-          lux_cars.sort((a, b) => acceleration_Scale(b['AccelSec']) - acceleration_Scale(a['AccelSec']));
-                                  //topSpeed_Scale(b['TopSpeed_KmH']) - topSpeed_Scale(a['TopSpeed_KmH']));
+          //lux_cars.sort((a, b) => acceleration_Scale(b['AccelSec']) - acceleration_Scale(a['AccelSec']));
+          lux_cars.sort((a, b) => parseInt(b['Range_Km']) - parseInt(a['Range_Km']));
 
           console.log(lux_cars);
 
