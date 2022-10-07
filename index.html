@@ -75,7 +75,6 @@
     <h4> By Fatima Yuen (fy46), Katherine Vella (skv25), and Lea Jih-Vieira (laj74) </h4>
 
     <p id ="visualization1">
-      <!--<h3><b> Visualization 1: Luxury Vehicle Performance Circle Chart </b></h3>-->
 
       <svg id="lux" height="700" width="1200"> </svg>
 
@@ -91,7 +90,7 @@
           const svg_lux = d3.select('svg#lux');
           const width = svg_lux.attr('width');
           const height = svg_lux.attr('height');
-          const margins = {top: 80, right: 10, bottom: 190, left: 170};
+          const margins = {top: 80, right: 10, bottom: 190, left: 190};
           const chartWidth = width - margins.left - margins.right;
           const chartHeight = height - margins.top - margins.bottom;
 
@@ -128,9 +127,7 @@
           // Sort Data Before Plotting
           //lux_cars.sort((a, b) => acceleration_Scale(b['AccelSec']) - acceleration_Scale(a['AccelSec']));
           lux_cars.sort((a, b) => parseInt(b['Range_Km']) - parseInt(a['Range_Km']));
-
-          console.log(lux_cars);
-
+          //console.log(lux_cars);
 
           // Y Scale
           const y_Scale = d3.scaleBand().domain(["AccelSec", "TopSpeed_KmH", "PriceEuro", "Efficiency_WhKm"])
@@ -140,19 +137,6 @@
           const carScale = d3.scaleBand().domain(brand_models).range([0, chartWidth-10]).paddingInner(.1)
                              .paddingOuter(.3);
 
-
-          // PARENT CHART G TAGS INITIALIZATION
-          /*
-          let back= svg_lux.append("g").attr("id", "background")
-                           .append("rect")
-                           .attr("x", 0)
-                           .attr("y", 0)
-                           .attr("fill", "#152238")
-                           .attr("rx", 30)
-                           .attr("ry", 30)
-                           .attr("width", width)
-                           .attr("height", height);
-          */
           let annotations = svg_lux.append("g").attr("id", "annotations"); // All labels and gridlines
           let chartArea = svg_lux.append("g")
                                  .attr("id", "points")
@@ -188,20 +172,19 @@
           // Initialize g Tag for X-Axis and Add Labels
           let bottomAxis = d3.axisBottom().scale(carScale);
           annotations.append("g")
-                     .attr("class", "x axis")
-                     .attr("transform",`translate(${margins.left}, ${chartHeight+margins.top+30})`)
-                     .call(bottomAxis)
-                     .selectAll(".tick text")
-                     .call(wrap, carScale.bandwidth());
+               .attr("class", "x axis")
+               .attr("transform",`translate(${margins.left}, ${chartHeight+margins.top+30})`)
+               .call(bottomAxis)
+               .selectAll(".tick text")
+               .call(wrap, carScale.bandwidth());
           let bottomGridlines = d3.axisBottom(carScale)
-                                  .tickSize(-chartHeight-20)
-                                  .tickFormat("");
-          //console.log(wrap(lux_cars.Brand_Model, 20));
+               .tickSize(-chartHeight-20)
+               .tickFormat("");
 
           annotations.append("g")
-                     .attr("class", "x gridlines")
-                     .attr("transform",`translate(${margins.left}, ${chartHeight+margins.top+10})`)
-                     .call(bottomGridlines);
+               .attr("class", "x gridlines")
+               .attr("transform",`translate(${margins.left}, ${chartHeight+margins.top+10})`)
+               .call(bottomGridlines);
 
           // Intialize g Tag for Y-Axis and Add Labels
           // custom labels - Source: https://ghenshaw-work.medium.com/customizing-axes-in-d3-js-99d58863738b
@@ -210,22 +193,17 @@
                             'Price (euro)', // renamed from "PriceEuro"
                             'Energy Consumed (wh/km)']; // renamed from "Efficiency_WhKm"
 
-          let leftAxis = d3.axisLeft(y_Scale) // Will need to change to include all in future!
-                          .tickFormat((d,i) => tickLabels[i]);
+          let leftAxis = d3.axisLeft(y_Scale)
+                .tickFormat((d,i) => tickLabels[i]);
 
           let leftGridlines = d3.axisLeft(y_Scale)
-                                .tickSize(-chartWidth-10)
-                                .tickFormat("");
+                .tickSize(-chartWidth-10)
+                .tickFormat("");
 
           annotations.append("g")
-                               .attr("class", "y axis")
-                               .attr("transform",`translate(${margins.left-10},${margins.top})`)
-                               .call(leftAxis);
-          // annotations.append("g")
-          //            .attr("class", "y gridlines")
-          //            .attr("transform",`translate(${margins.left-10},${margins.top})`)
-          //            .call(leftGridlines);
-
+               .attr("class", "y axis")
+               .attr("transform",`translate(${margins.left-10},${margins.top})`)
+               .call(leftAxis);
 
         // Acceleration
         chartArea.append("g").selectAll("circle").data(lux_cars)
@@ -260,7 +238,6 @@
                     .style("fill",  d => efficiency_colorScale(d.Efficiency_WhKm));
 
           // Legend
-
           const legend_colorScale= d3.scaleSequential().interpolator(d3.interpolateCool).domain(circle_radius);
 
           let legend_array = [];
@@ -305,7 +282,6 @@
 
     <!-- BARCHART -->
     <p id ="visualization2">
-      <!--<h3><b> Visualization 2: Range (km) Barchart </b></h3>-->
 
       <svg id="range_barchart" height="500" width="1200"> </svg>
 
@@ -326,8 +302,8 @@
 
           let annotations = svgBar.append("g").attr("id", "annotations"); // All labels and gridlines
           let chartArea = svgBar.append("g")
-                                 .attr("id", "points")
-                                 .attr("transform",`translate(${margins.left}, ${margins.top})`); // All vis content
+                 .attr("id", "points")
+                 .attr("transform",`translate(${margins.left}, ${margins.top})`); // All vis content
 
           // Filter Dataset for Luxury Vehicles
           let lux_cars = data.filter(function(d) {return d.Segment == "F";})
@@ -352,29 +328,29 @@
 
           // Title
           annotations.append("text")
-            .attr("class", "title")
-            .attr("text-anchor", "middle")
-            .attr("x", width/2)
-            .attr("y", 30)
-            .text("Bar Chart of Range (Km) by Model of Car")
-            //.style("fill", "white")
-            .style("font-size", "30px")
+              .attr("class", "title")
+              .attr("text-anchor", "middle")
+              .attr("x", width/2)
+              .attr("y", 30)
+              .text("Bar Chart of Range (Km) by Model of Car")
+              //.style("fill", "white")
+              .style("font-size", "30px")
 
           // x axis (Range) and y axis (BrandModel)
           let leftAxis = d3.axisLeft(carScale); // Will need to change to include all in future!
           let leftGridlines = d3.axisLeft(carScale)
-                                .tickSize(-chartWidth-10)
-                                .tickFormat("");
+                .tickSize(-chartWidth-10)
+                .tickFormat("");
           annotations.append("g")
-                     .attr("class", "y axis")
-                     .attr("transform",`translate(${margins.left-10},${margins.top})`)
-                     .call(leftAxis);
+               .attr("class", "y axis")
+               .attr("transform",`translate(${margins.left-10},${margins.top})`)
+               .call(leftAxis);
 
           let bottomAxis = d3.axisBottom().scale(rangeScale);
           annotations.append("g")
-                     .attr("class", "x axis")
-                     .attr("transform",`translate(${margins.left}, ${chartHeight+margins.top+10})`)
-                     .call(bottomAxis)
+             .attr("class", "x axis")
+             .attr("transform",`translate(${margins.left}, ${chartHeight+margins.top+10})`)
+             .call(bottomAxis)
 
           // Axis Labels
           // X-axis label
