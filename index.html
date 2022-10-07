@@ -280,13 +280,8 @@
           //            .attr("transform",`translate(${margins.left-10},${margins.top})`)
           //            .call(leftGridlines);
 
-
-          let circles= chartArea.selectAll('g.circle').data(lux_cars)
-                                .join("g")
-                                .attr("class", "circle");
-
         // Acceleration
-        circles.append("g").selectAll("g.circle").data(lux_cars)
+        chartArea.append("g").selectAll("circle").data(lux_cars)
                .join("circle")
                .attr("cx", d => carScale(d.Brand_Model) + (carScale.bandwidth()/2))
                .attr("cy", y_Scale("AccelSec") + y_Scale.bandwidth()/2)
@@ -294,7 +289,7 @@
                .style("fill",  d => acceleration_colorScale(d.AccelSec));
 
         // Top Speed
-          circles.append("g").selectAll("g.circle").data(lux_cars)
+        chartArea.append("g").selectAll("circle").data(lux_cars)
                  .join("circle")
                  .attr("cx", d => carScale(d.Brand_Model) + (carScale.bandwidth()/2))
                  .attr("cy", y_Scale("TopSpeed_KmH") + y_Scale.bandwidth()/2)
@@ -302,7 +297,7 @@
                  .style("fill",  d => topSpeed_colorScale(d.TopSpeed_KmH));
 
           // Price
-          circles.append("g").selectAll("g.circle").data(lux_cars)
+          chartArea.append("g").selectAll("circle").data(lux_cars)
                   .join("circle")
                   .attr("cx", d => carScale(d.Brand_Model) + (carScale.bandwidth()/2))
                   .attr("cy", y_Scale("PriceEuro") + y_Scale.bandwidth()/2)
@@ -310,7 +305,7 @@
                   .style("fill",  d => price_colorScale(d.PriceEuro));
 
         // Efficiency
-        circles.append("g").selectAll("g.circle").data(lux_cars)
+        chartArea.append("g").selectAll("circle").data(lux_cars)
                   .join("circle")
                   .attr("cx", d => carScale(d.Brand_Model) + (carScale.bandwidth()/2))
                   .attr("cy", y_Scale("Efficiency_WhKm") + y_Scale.bandwidth()/2)
