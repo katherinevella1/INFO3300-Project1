@@ -140,7 +140,7 @@
     <p id ="visualization1">
       <h3><b> Visualization 1: Luxury Vehicle Performance Circle Chart </b></h3>
 
-      <svg id="lux" height="600" width="1200"> </svg>
+      <svg id="lux" height="700" width="1200"> </svg>
 
       <script>
         // Loading the dataset
@@ -148,13 +148,13 @@
 
         d3.csv('ElectricCarData_Clean.csv').then( (data) => { // Begin promise
           dataset = data;
-          console.log(data);
+          //console.log(data);
 
           // Visualization Constants Setup
           const svg_lux = d3.select('svg#lux');
           const width = svg_lux.attr('width');
           const height = svg_lux.attr('height');
-          const margins = {top: 80, right: 10, bottom: 90, left: 150};
+          const margins = {top: 80, right: 10, bottom: 190, left: 150};
           const chartWidth = width - margins.left - margins.right;
           const chartHeight = height - margins.top - margins.bottom;
 
@@ -168,7 +168,7 @@
           });
 
           // Range for all radius scales
-          const circle_radius= [10, 40];
+          const circle_radius= [5, 30];
 
           // Extents and Scales Setup
           // Y-axis is going to consist of AccelSec, TopSpeed_KmH, PriceEuro, Range_Km
@@ -236,7 +236,7 @@
               .attr("class", "x label")
               .attr("text-anchor", "center")
               .attr("x", width/2)
-              .attr("y", height - 5)
+              .attr("y", height - 100)
               .text("Vehicle Model");
 
           // Y-axis label
@@ -280,33 +280,18 @@
           //            .attr("transform",`translate(${margins.left-10},${margins.top})`)
           //            .call(leftGridlines);
 
-          // Legend
-          let legend_array = [];
-          for (let i = circle_radius[0]; i <= circle_radius[1]; i+=5) {
-               legend_array.push(i);
-             }
-
-          //const legend_Scale=
-
-          svg_lux.selectAll("circle").data(legend_array)
-                 .join("circle")
-                 .attr("r", d => d.values)
-                 .attr("fill", d => acceleration_colorScale(acceleration_Scale(d.values))) // is .values right?
-                 .attr("cx", d => 10) //what
-                 .attr("cy", d => 500); // what
-
 
           let circles= chartArea.selectAll('g.circle').data(lux_cars)
                                 .join("g")
                                 .attr("class", "circle");
 
-          // Acceleration
-          circles.append("g").selectAll("g.circle").data(lux_cars)
-                 .join("circle")
-                 .attr("cx", d => carScale(d.Brand_Model) + (carScale.bandwidth()/2))
-                 .attr("cy", y_Scale("AccelSec") + y_Scale.bandwidth()/2)
-                 .attr("r", d => acceleration_Scale(d.AccelSec))
-                 .style("fill",  d => acceleration_colorScale(d.AccelSec));
+        // Acceleration
+        circles.append("g").selectAll("g.circle").data(lux_cars)
+               .join("circle")
+               .attr("cx", d => carScale(d.Brand_Model) + (carScale.bandwidth()/2))
+               .attr("cy", y_Scale("AccelSec") + y_Scale.bandwidth()/2)
+               .attr("r", d => acceleration_Scale(d.AccelSec))
+               .style("fill",  d => acceleration_colorScale(d.AccelSec));
 
         // Top Speed
           circles.append("g").selectAll("g.circle").data(lux_cars)
@@ -331,6 +316,25 @@
                   .attr("cy", y_Scale("Efficiency_WhKm") + y_Scale.bandwidth()/2)
                   .attr("r", d => efficiency_Scale(d.Efficiency_WhKm))
                   .style("fill",  d => efficiency_colorScale(d.Efficiency_WhKm));
+
+        // Legend
+
+        const legend_colorScale= d3.scaleSequential().interpolator(d3.interpolateCool).domain(circle_radius);
+
+        let legend_array = [];
+        let counter=0;
+        for (let i = circle_radius[0]; i <= circle_radius[1]; i+=.03) {
+             chartArea.append("circle")
+               .attr('r', i )
+               .attr("cx", counter*1.2)
+               .attr("cy", chartHeight+150)
+               .attr("fill", legend_colorScale(i));
+             counter++;
+        }
+
+
+
+
         }); // End of promise
 
         // Function to wrap labels provided by Blocks.org (https://bl.ocks.org/guypursey/f47d8cd11a8ff24854305505dbbd8c07)
