@@ -29,6 +29,9 @@
             border-radius: 25px;
             padding: 30px;
             color: white;
+            margin-left:auto;
+            margin-right:auto;
+            display:block;
           }
 
           #lux{
@@ -36,10 +39,17 @@
             border-radius: 25px;
             padding: 30px;
             color: white;
+            margin-left:auto;
+            margin-right:auto;
+            display:block;
           }
 
           #annotations{
             color: white;
+          }
+
+          text{
+            font-size: 13px;
           }
 
           text.title{
@@ -138,7 +148,7 @@
     -->
 
     <p id ="visualization1">
-      <h3><b> Visualization 1: Luxury Vehicle Performance Circle Chart </b></h3>
+      <!--<h3><b> Visualization 1: Luxury Vehicle Performance Circle Chart </b></h3>-->
 
       <svg id="lux" height="700" width="1200"> </svg>
 
@@ -154,7 +164,7 @@
           const svg_lux = d3.select('svg#lux');
           const width = svg_lux.attr('width');
           const height = svg_lux.attr('height');
-          const margins = {top: 80, right: 10, bottom: 190, left: 150};
+          const margins = {top: 80, right: 10, bottom: 190, left: 170};
           const chartWidth = width - margins.left - margins.right;
           const chartHeight = height - margins.top - margins.bottom;
 
@@ -236,7 +246,7 @@
               .attr("class", "x label")
               .attr("text-anchor", "center")
               .attr("x", width/2)
-              .attr("y", height - 100)
+              .attr("y", height - 70)
               .text("Vehicle Model");
 
           // Y-axis label
@@ -326,8 +336,8 @@
         for (let i = circle_radius[0]; i <= circle_radius[1]; i+=.03) {
              chartArea.append("circle")
                .attr('r', i )
-               .attr("cx", counter*1.2)
-               .attr("cy", chartHeight+150)
+               .attr("cx", counter*1.2 - 20)
+               .attr("cy", chartHeight+158)
                .attr("fill", legend_colorScale(i));
              counter++;
         }
@@ -366,9 +376,9 @@
 
     <!-- BARCHART -->
     <p id ="visualization2">
-      <h3><b> Visualization 2: Range (km) Barchart </b></h3>
+      <!--<h3><b> Visualization 2: Range (km) Barchart </b></h3>-->
 
-      <svg id="range_barchart" height="500" width="1100"> </svg>
+      <svg id="range_barchart" height="500" width="1200"> </svg>
 
       <script>
         // Loading the dataset
@@ -381,7 +391,7 @@
           const svgBar = d3.select('svg#range_barchart');
           const width = svgBar.attr('width');
           const height = svgBar.attr('height');
-          const margins = {top: 60, right: 80, bottom: 60, left: 200};
+          const margins = {top: 60, right: 80, bottom: 70, left: 240};
           const chartWidth = width - margins.left - margins.right;
           const chartHeight = height - margins.top - margins.bottom;
 
