@@ -281,14 +281,19 @@
           //            .call(leftGridlines);
 
           // Legend
-          // var legend_array = [];
-          // for (var i = circle_radius[0]; i <= circle_radius[1]; i+5) {
-          //     legend_array.push(i);
-          //   }
-          //
-          //   console.log(legend_array);
+          let legend_array = [];
+          for (let i = circle_radius[0]; i <= circle_radius[1]; i+=5) {
+               legend_array.push(i);
+             }
 
-          //let legend =
+          //const legend_Scale=
+
+          svg_lux.selectAll("circle").data(legend_array)
+                 .join("circle")
+                 .attr("r", d => d.values)
+                 .attr("fill", d => acceleration_colorScale(acceleration_Scale(d.values))) // is .values right?
+                 .attr("cx", d => 10) //what
+                 .attr("cy", d => 500); // what
 
 
           let circles= chartArea.selectAll('g.circle').data(lux_cars)
