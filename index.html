@@ -164,8 +164,8 @@
           annotations.append("text")
               .attr("class", "y label")
               .attr("text-anchor", "end")
-              .attr("x", -chartHeight/2 + 20)
-              .attr("y", 30)
+              .attr("x", -chartHeight/2)
+              .attr("y", 15)
               .attr("transform", "rotate(-90)")
              .text("Performance Metric");
 
@@ -188,7 +188,7 @@
 
           // Intialize g Tag for Y-Axis and Add Labels
           // custom labels - Source: https://ghenshaw-work.medium.com/customizing-axes-in-d3-js-99d58863738b
-          let tickLabels = ['Acceleration 0-100 km/hr (secs)', // renamed from "AccelSec"
+          let tickLabels = ['Seconds to Accelerate to 100 km/hr', // renamed from "AccelSec"
                             'Highest Speed (km/hr)', // renamed from "TopSpeed_KmH"
                             'Price (euro)', // renamed from "PriceEuro"
                             'Energy Consumed (wh/km)']; // renamed from "Efficiency_WhKm"
@@ -425,8 +425,8 @@
               .attr('id', l => l['PriceEuro']) //just using price euro as a unique identifier..
               .attr('xlink:href', l => 'images/' + l.Brand_Model + '.png')
               .attr('height', carScale.bandwidth()-5)
-              .attr('width', 84.83)
-              .attr("x", l => rangeScale(l.Range_Km)+10)
+              .attr('width', 47.89)
+              .attr("x", l => rangeScale(l.Range_Km)+5)
               .attr("y", l => carScale(l.Brand_Model)-2)
 
         );
