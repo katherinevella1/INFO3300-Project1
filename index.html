@@ -140,7 +140,7 @@
     <p id ="visualization1">
       <h3><b> Visualization 1: Luxury Vehicle Performance Circle Chart </b></h3>
 
-      <svg id="lux" height="500" width="1100"> </svg>
+      <svg id="lux" height="600" width="1200"> </svg>
 
       <script>
         // Loading the dataset
@@ -154,7 +154,7 @@
           const svg_lux = d3.select('svg#lux');
           const width = svg_lux.attr('width');
           const height = svg_lux.attr('height');
-          const margins = {top: 10, right: 10, bottom: 150, left: 100};
+          const margins = {top: 80, right: 10, bottom: 90, left: 150};
           const chartWidth = width - margins.left - margins.right;
           const chartHeight = height - margins.top - margins.bottom;
 
@@ -162,34 +162,31 @@
           // Filter Dataset for Luxury Vehicles
           let lux_cars = data.filter(function(d) {return d.Segment == "F";})
 
-          // NEED TO FIX!!!!
-          //let top_six = lux_cars.filter(d => d.Model == "Air" || d.Model == "e-tron GT" || d.Model == "One" || d.Model == "Taycan Cross Turismo" || "Model X Performance");
-
           // Create New Column "Brand_Model" - Combine the Brand and Model names for labeling clarity on vis
           lux_cars.forEach( (d, i) => {
             d["Brand_Model"] = d["Brand"]+d["Model"];
           });
 
-          lux_cars.sort((a, b) => parseInt(b['Range_Km']) - parseInt(a['Range_Km']));
-
+          // Range for all radius scales
+          const circle_radius= [10, 40];
 
           // Extents and Scales Setup
           // Y-axis is going to consist of AccelSec, TopSpeed_KmH, PriceEuro, Range_Km
           const accelerationExtent = d3.extent(lux_cars, d => parseInt(d['AccelSec']));
-          const acceleration_Scale = d3.scaleLinear().domain(accelerationExtent).range([10, 40]);
+          const acceleration_Scale = d3.scaleLinear().domain(accelerationExtent).range(circle_radius);
           const acceleration_colorScale= d3.scaleSequential().interpolator(d3.interpolateCool).domain(accelerationExtent);
 
           const topSpeedExtent = d3.extent(lux_cars, d => parseInt(d['TopSpeed_KmH']));
-          const topSpeed_Scale = d3.scaleLinear().domain(topSpeedExtent).range([10, 40]);
+          const topSpeed_Scale = d3.scaleLinear().domain(topSpeedExtent).range(circle_radius);
           const topSpeed_colorScale= d3.scaleSequential().interpolator(d3.interpolateCool).domain(topSpeedExtent);
 
           const priceExtent = d3.extent(lux_cars, d => parseInt(d['PriceEuro']));
-          const price_Scale = d3.scaleLinear().domain(priceExtent).range([10, 40]);
+          const price_Scale = d3.scaleLinear().domain(priceExtent).range(circle_radius);
           const price_colorScale= d3.scaleSequential().interpolator(d3.interpolateCool).domain(priceExtent);
 
-          const rangeExtent = d3.extent(lux_cars, d => parseInt(d['Range_Km']));
-          const range_Scale = d3.scaleLinear().domain(rangeExtent).range([10, 40]);
-          const range_colorScale= d3.scaleSequential().interpolator(d3.interpolateCool).domain(rangeExtent);
+          const efficiencyExtent = d3.extent(lux_cars, d => parseInt(d['Efficiency_WhKm']));
+          const efficiency_Scale = d3.scaleLinear().domain(efficiencyExtent).range(circle_radius);
+          const efficiency_colorScale= d3.scaleSequential().interpolator(d3.interpolateCool).domain(efficiencyExtent);
 
           // Sort Data Before Plotting
           lux_cars.sort((a, b) => acceleration_Scale(b['AccelSec']) - acceleration_Scale(a['AccelSec']));
@@ -199,7 +196,7 @@
 
 
           // Y Scale
-          const y_Scale = d3.scaleBand().domain(["AccelSec", "TopSpeed_KmH", "PriceEuro", "Range_Km"])
+          const y_Scale = d3.scaleBand().domain(["AccelSec", "TopSpeed_KmH", "PriceEuro", "Efficiency_WhKm"])
                                          .range([chartHeight, 0]);
 
           const brand_models = d3.map(lux_cars, d => d.Brand_Model);
@@ -228,11 +225,28 @@
           annotations.append("text")
             .attr("class", "title")
             .attr("x", width/2)
-            .attr("y", 10)
+            .attr("y", 30)
             .attr("text-anchor", "middle")
             .text("Luxury Vehicle Performance Circle Chart")
             .style("font-size", "30px")
             .style("margin-bottom", "10")
+
+          // X-Axis Label
+          annotations.append("text")
+              .attr("class", "x label")
+              .attr("text-anchor", "center")
+              .attr("x", width/2)
+              .attr("y", height - 5)
+              .text("Vehicle Model");
+
+          // Y-axis label
+          annotations.append("text")
+              .attr("class", "y label")
+              .attr("text-anchor", "end")
+              .attr("x", -chartHeight/2 + 20)
+              .attr("y", 30)
+              .attr("transform", "rotate(-90)")
+             .text("Performance Metric");
 
           // Initialize g Tag for X-Axis and Add Labels
           let bottomAxis = d3.axisBottom().scale(carScale);
@@ -243,8 +257,8 @@
                      .selectAll(".tick text")
                      .call(wrap, carScale.bandwidth());
           let bottomGridlines = d3.axisBottom(carScale)
-                                  .tickSize(-chartWidth-10)
-                                  .tickFormat("")
+                                  .tickSize(-chartHeight-20)
+                                  .tickFormat("");
           //console.log(wrap(lux_cars.Brand_Model, 20));
 
           annotations.append("g")
@@ -265,6 +279,17 @@
           //            .attr("class", "y gridlines")
           //            .attr("transform",`translate(${margins.left-10},${margins.top})`)
           //            .call(leftGridlines);
+
+          // Legend
+          var legend_array = [];
+          for (var i = circle_radius[0]; i <= circle_radius[1]; i+5) {
+              legend_array.push(i);
+            }
+
+            console.log(legend_array);
+
+          //let legend =
+
 
           let circles= chartArea.selectAll('g.circle').data(lux_cars)
                                 .join("g")
@@ -294,13 +319,13 @@
                   .attr("r", d => price_Scale(d.PriceEuro))
                   .style("fill",  d => price_colorScale(d.PriceEuro));
 
-        // Range
+        // Efficiency
         circles.append("g").selectAll("g.circle").data(lux_cars)
                   .join("circle")
                   .attr("cx", d => carScale(d.Brand_Model) + (carScale.bandwidth()/2))
-                  .attr("cy", y_Scale("Range_Km") + y_Scale.bandwidth()/2)
-                  .attr("r", d => range_Scale(d.Range_Km))
-                  .style("fill",  d => range_colorScale(d.Range_Km));
+                  .attr("cy", y_Scale("Efficiency_WhKm") + y_Scale.bandwidth()/2)
+                  .attr("r", d => efficiency_Scale(d.Efficiency_WhKm))
+                  .style("fill",  d => efficiency_colorScale(d.Efficiency_WhKm));
         }); // End of promise
 
         // Function to wrap labels provided by Blocks.org (https://bl.ocks.org/guypursey/f47d8cd11a8ff24854305505dbbd8c07)
