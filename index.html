@@ -76,7 +76,7 @@
 
     <p id ="visualization1">
 
-      <svg id="lux" height="525" width="900"> </svg>
+      <svg id="lux" height="535" width="900"> </svg>
 
       <script>
         // Loading the dataset
@@ -129,10 +129,6 @@
           lux_cars.sort((a, b) => parseInt(b['Range_Km']) - parseInt(a['Range_Km']));
           //console.log(lux_cars);
 
-          // Y Scale
-          const y_Scale = d3.scaleBand().domain(["AccelSec", "TopSpeed_KmH", "PriceEuro", "Efficiency_WhKm"])
-                                         .range([chartHeight, 0]);
-
           const brand_models = d3.map(lux_cars, d => d.Brand_Model);
           const carScale = d3.scaleBand().domain(brand_models).range([0, chartWidth-10]).paddingInner(.1)
                              .paddingOuter(.3);
@@ -148,7 +144,7 @@
             .attr("x", width/2)
             .attr("y", 30)
             .attr("text-anchor", "middle")
-            .text("Luxury Vehicle Performance Circle Chart")
+            .text("Luxury Electric Vehicle Performance Circle Chart")
             .style("font-size", "30px")
             .style("margin-bottom", "10")
 
@@ -177,10 +173,10 @@
                .call(bottomAxis)
                .selectAll(".tick text")
                .call(wrap, carScale.bandwidth());
+
           let bottomGridlines = d3.axisBottom(carScale)
                .tickSize(-chartHeight-20)
                .tickFormat("");
-
           annotations.append("g")
                .attr("class", "x gridlines")
                .attr("transform",`translate(${margins.left}, ${chartHeight+margins.top+10})`)
@@ -193,8 +189,12 @@
                             'Price (euro)', // renamed from "PriceEuro"
                             'Energy Consumed (wh/km)']; // renamed from "Efficiency_WhKm"
 
-          let leftAxis = d3.axisLeft(y_Scale)
-                .tickFormat((d,i) => tickLabels[i]);
+          // Y Scale
+          const y_Scale = d3.scaleBand().domain(tickLabels)
+                                        .range([chartHeight, 0]).paddingInner(.1)
+                                        .paddingOuter(.3);
+
+          let leftAxis = d3.axisLeft(y_Scale);
 
           let leftGridlines = d3.axisLeft(y_Scale)
                 .tickSize(-chartWidth-10)
@@ -203,13 +203,16 @@
           annotations.append("g")
                .attr("class", "y axis")
                .attr("transform",`translate(${margins.left-10},${margins.top})`)
-               .call(leftAxis);
+               .call(leftAxis)
+               .selectAll(".tick text")
+               .attr('dx', -10)
+               .call(wrap, y_Scale.bandwidth() + 80);
 
         // Acceleration
         chartArea.append("g").selectAll("circle").data(lux_cars)
                .join("circle")
                .attr("cx", d => carScale(d.Brand_Model) + (carScale.bandwidth()/2))
-               .attr("cy", y_Scale("AccelSec") + y_Scale.bandwidth()/2)
+               .attr("cy", y_Scale('Seconds to Accelerate to 100 km/hr') + y_Scale.bandwidth()/2)
                .attr("r", d => acceleration_Scale(d.AccelSec))
                .style("fill",  d => acceleration_colorScale(d.AccelSec));
 
@@ -217,7 +220,7 @@
         chartArea.append("g").selectAll("circle").data(lux_cars)
                  .join("circle")
                  .attr("cx", d => carScale(d.Brand_Model) + (carScale.bandwidth()/2))
-                 .attr("cy", y_Scale("TopSpeed_KmH") + y_Scale.bandwidth()/2)
+                 .attr("cy", y_Scale('Highest Speed (km/hr)') + y_Scale.bandwidth()/2)
                  .attr("r", d => topSpeed_Scale(d.TopSpeed_KmH))
                  .style("fill",  d => topSpeed_colorScale(d.TopSpeed_KmH));
 
@@ -225,7 +228,7 @@
           chartArea.append("g").selectAll("circle").data(lux_cars)
                   .join("circle")
                   .attr("cx", d => carScale(d.Brand_Model) + (carScale.bandwidth()/2))
-                  .attr("cy", y_Scale("PriceEuro") + y_Scale.bandwidth()/2)
+                  .attr("cy", y_Scale('Price (euro)') + y_Scale.bandwidth()/2)
                   .attr("r", d => price_Scale(d.PriceEuro))
                   .style("fill",  d => price_colorScale(d.PriceEuro));
 
@@ -233,7 +236,7 @@
           chartArea.append("g").selectAll("circle").data(lux_cars)
                     .join("circle")
                     .attr("cx", d => carScale(d.Brand_Model) + (carScale.bandwidth()/2))
-                    .attr("cy", y_Scale("Efficiency_WhKm") + y_Scale.bandwidth()/2)
+                    .attr("cy", y_Scale('Energy Consumed (wh/km)') + y_Scale.bandwidth()/2)
                     .attr("r", d => efficiency_Scale(d.Efficiency_WhKm))
                     .style("fill",  d => efficiency_colorScale(d.Efficiency_WhKm));
 
@@ -250,6 +253,22 @@
                  .attr("fill", legend_colorScale(i));
                counter++;
           }
+
+          annotations.append("text")
+            .attr("class", "legend label")
+            .attr("x", margins.left-58)
+            .attr("y", 507)
+            .text("Low")
+            .style("font-size", "15px")
+            .attr("fill", "white");
+
+            annotations.append("text")
+              .attr("class", "legend label")
+              .attr("x", width-margins.right-30)
+              .attr("y", 507)
+              .text("High")
+              .style("font-size", "15px")
+              .attr("fill", "white");
 
         }); // End of promise
 
@@ -332,7 +351,7 @@
               .attr("text-anchor", "middle")
               .attr("x", width/2)
               .attr("y", 30)
-              .text("Bar Chart of Range (Km) by Vehicle Model")
+              .text("Bar Chart of Range (Km) by Electric Vehicle Model")
               //.style("fill", "white")
               .style("font-size", "30px")
 
